@@ -9,75 +9,124 @@ using System.Data.Sql;
 using System.Data.SqlTypes;
 using System.Drawing;
 using tlib;
+
 namespace sql_dump
 {
 	class tsql_dump:t
 	{
-		public void f_connect(t args)
+
+		public tsql_dump(t args)
 		{
 			//входные параметры
-			string server = args["server"].f_str();
-			string server_name = args["server_name"].f_str();
-			string login = args["login"].f_str();
-			string pass = args["pass"].f_str();
-			
-			//формируем строку подключения, без указания конкретной БД
-			string sql_conn_str =	"Server=" + server + "/" + server_name + ";Database=;User Id=" + login + ";Password=" + pass;
 
-			//создаем подключение
-			SqlConnection sql_conn = new SqlConnection(sql_conn_str);
-			
-			
+			t_msslq_cli mssql_cli = new t_msslq_cli();
 
-			//выносим в global нашего объекта
-			this["sql_conn_str"] = new t(sql_conn_str);
-			this["sql_conn"] = new t(sql_conn);
+			mssql_cli.f_connect(args);
 
-
-			//t.f_fdone(args["fdone"], new t());
-
+			//вывод в global
+			this["mssql_cli"] = mssql_cli;
 		}
 
-		public void f_exec_cmd(t args)
+        public void f_db_arr(t args)
+        {
+            t_msslq_cli mssql_cli = this["mssql_cli"].f_val<t_msslq_cli>();
+
+            //получаем список доступных бд для сервера
+            //и выполняем f_each если передана
+            mssql_cli.f_select(new t()
+            {
+                {"cmd",          "exec sp_databases"},
+                {"tab_name",     "tabs"},
+                {
+					"f_done", new t_f<t,t>(delegate(t args_1)
+					{
+						DataTable tab=args_1["tab"].f_val<DataTable>();
+					
+						int i=-1;
+						foreach(DataRow dr in tab.Rows)
+						{
+							i++;
+
+							f_f("f_each", args.f_add(true, new t()
+							{
+								{"item",	dr["database_name"].ToString()},
+								{"index",	i}
+							}));
+						}
+
+						return null;
+					})
+				}
+            });
+        }
+
+		public void f_tab_arr(t args)
 		{
-			string			cmd_text =		args["cmd"].f_str();
-			SqlConnection	conn =			this["sql_connection"].f_val<SqlConnection>();
+			t_msslq_cli mssql_cli = this["mssql_cli"].f_val<t_msslq_cli>();
+			string db_name = args["db_name"].f_str();
 
-			SqlCommand cmd = new SqlCommand(cmd_text, conn);
+			//получаем список доступных бд для сервера
+			//и выполняем f_each если передана
+			mssql_cli.f_select(new t()
+            {
+                {"cmd",			"select * from sys.Tables"},
+                {"tab_name",	"tabs"},
+				{"db_name",		db_name},
+				{
+					"each", new t()
+					{
+						{"sort", "name ASC"}
+					}
+				},
+                {
+					"f_each", new t_f<t,t>(delegate(t args_1)
+					{
+						DataRow dr=args_1["each"]["item"].f_val<DataRow>();
+						int index = args_1["each"]["index"].f_val<int>();
 
+						f_f("f_each", args.f_add(true, new t()
+						{
+							{"item",	dr["name"].ToString()},
+							{"index",	index}
+						}));
 
-			
-
-			//chb_db.Items.Add();
+						return null;
+					})
+				}
+            });
 		}
 
-		public void f_select(t args)
+		public void f_dump(t args)
 		{
-
-			string cmd_text = args["cmd"].f_str();
+			t_msslq_cli mssql_cli = this["mssql_cli"].f_val<t_msslq_cli>();
 			string tab_name = args["tab_name"].f_str();
 
-			SqlConnection conn = this["sql_connection"].f_val<SqlConnection>();
+			string ins_sql_str="";
 
-			//t_f<t, t> f_done = args["f_done"].f_f<t_f>();
+			//получаем список доступных бд для сервера
+			//и выполняем f_each если передана
+			mssql_cli.f_select(new t()
+            {
+                {"cmd",			"Select * from "+tab_name},
+                {	//когда будет получена таблица
+					"f_done", new t_f<t,t>(delegate(t args_1)
+					{
+						DataTable tab = args_1["tab"].f_val<DataTable>();
 
-			//создаем адаптек для запроса
-			SqlDataAdapter ad= new SqlDataAdapter(cmd_text, conn);
+						//формируем inset запрос для строк полученной таблицы
+						mssql_cli.f_make_ins_query(new t()
+						{
+							{"tab", tab},
+							{	//когда запрос будет сформирован
+								//возвращаем его наверх
+								"f_done", args["f_done"].f_f()
+							}
+						});
 
-			//создаем таблицу для результата
-			DataTable tab = new DataTable(tab_name);
-
-			//получаем данные, заполняем таблицу
-			ad.Fill(tab);
-
-			//вкидываем в принятые параметры полеченную таблицу и возвращаем результат
-			//в функцию обратного вызова
-
-			args["tab"] = new t(tab);
-
-			t_uti.f_fdone(args);
-
-			return;
+						return null;
+					})
+				}
+            });
 		}
 
 	}
