@@ -36,6 +36,11 @@ namespace sql_dump
 
         private void btn_connect_Click(object sender, RoutedEventArgs e)
         {
+			f_cre_sql_dump();
+        }
+
+		private tsql_dump f_cre_sql_dump()
+		{
 			tsql_dump sql_dump = new tsql_dump(new t()
 			{
                 {"server",       txt_server.Text},
@@ -52,7 +57,7 @@ namespace sql_dump
 						return null;
 					})
 				},
-								{
+				{
 					"f_fail", new t_f<t,t>(delegate(t args_1)
 					{
 
@@ -68,11 +73,13 @@ namespace sql_dump
 
 			//выводим в глобал
 			args["sql_dump"] = new t(sql_dump);
-        }
+
+			return sql_dump;
+		}
 
         private void chb_db_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            tsql_dump sql_dump = args["sql_dump"].f_val<tsql_dump>();
+            tsql_dump sql_dump = args["sql_dump"].f_def_set(f_cre_sql_dump()).f_val<tsql_dump>();
 
 			//если в списке уже есть элементы - уже запрашивали
 			if (chb_db.Items.Count > 0)
@@ -99,7 +106,8 @@ namespace sql_dump
 
 						return null;
 					})
-				}
+				},
+				{"f_fail", new t_f<t,t>(f_fail)}
             });
 
         }
@@ -108,7 +116,7 @@ namespace sql_dump
 		{
 			ComboBox chb = (ComboBox)sender;
 
-			tsql_dump sql_dump = args["sql_dump"].f_val<tsql_dump>();
+			tsql_dump sql_dump = args["sql_dump"].f_def_set(f_cre_sql_dump()).f_val<tsql_dump>();
 
 			//если в списке уже есть элементы - уже запрашивали
 			if (chb.Items.Count > 0)
@@ -129,6 +137,18 @@ namespace sql_dump
 						int i = args_1["index"].f_val<int>();
 
 						chb.Items.Add(item);
+
+						return null;
+					})
+				},
+				{
+					"f_fail", new t_f<t,t>(delegate(t args_1)
+					{
+
+						SqlException ex = args_1["ex"].f_val<SqlException>();
+
+						txt_out.Text=ex.Message+"\r\n";
+						txt_out.Text=args_1["message"].f_str()+"\r\n";
 
 						return null;
 					})
@@ -157,6 +177,15 @@ namespace sql_dump
 			});
 		}
 
+		private t f_fail(t args)
+		{
+			SqlException ex = args["ex"].f_def_set(new Exception("ex не задан")).f_val<SqlException>();
+
+			txt_out.Text=ex.Message+"\r\n";
+			txt_out.Text=args["message"].f_str()+"\r\n";
+
+			return null;
+		}
 
     }
 }

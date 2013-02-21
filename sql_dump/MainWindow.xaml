@@ -4,10 +4,10 @@
         Title="MainWindow" Height="496" Width="821">
     <Grid>
         <Button x:Name="btn_connect" Content="Соединить" HorizontalAlignment="Left" Margin="510,10,0,0" VerticalAlignment="Top" Width="126" Height="22" Click="btn_connect_Click"/>
-        <TextBox x:Name="txt_server" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="localhost" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="txt_server_name" HorizontalAlignment="Left" Height="23" Margin="135,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="sqlexpress"/>
+        <TextBox x:Name="txt_server" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="192.168.1.201" VerticalAlignment="Top" Width="120" />
+        <TextBox x:Name="txt_server_name" HorizontalAlignment="Left" Height="23" Margin="135,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="txt_login" HorizontalAlignment="Left" Height="23" Margin="260,10,0,0" TextWrapping="Wrap" Text="sa" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="txt_pass" HorizontalAlignment="Left" Height="23" Margin="385,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="4825"/>
+        <TextBox x:Name="txt_pass" HorizontalAlignment="Left" Height="23" Margin="385,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="82757662=z"/>
         <ComboBox x:Name="chb_db" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Width="120" Height="22" MouseLeftButtonUp="chb_db_MouseLeftButtonUp" PreviewMouseLeftButtonUp="chb_db_MouseLeftButtonUp"/>
         <ComboBox x:Name="chb_table_name" HorizontalAlignment="Left" Margin="135,38,0,0" VerticalAlignment="Top" Width="120" Height="22" PreviewMouseLeftButtonUp="chb_table_name_PreviewMouseLeftButtonUp"/>
         <Button x:Name="btn_dump" Content="dump" HorizontalAlignment="Left" Margin="260,38,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="btn_dump_Click"/>

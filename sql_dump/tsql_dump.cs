@@ -14,6 +14,10 @@ namespace sql_dump
 {
 	class tsql_dump:t
 	{
+		public tsql_dump()
+		{
+
+		}
 
 		public tsql_dump(t args)
 		{
