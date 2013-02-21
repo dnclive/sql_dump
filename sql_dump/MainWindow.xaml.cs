@@ -84,6 +84,10 @@ namespace sql_dump
             //и запрашиваем 
             sql_dump.f_db_arr(new t()
             {
+				{"server",       txt_server.Text},
+                {"server_name",  txt_server_name.Text},
+                {"login",        txt_login.Text},
+                {"pass",         txt_pass.Text},
                 {
 					"f_each", new t_f<t,t>(delegate(t args_1)
 					{

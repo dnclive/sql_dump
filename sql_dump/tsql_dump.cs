@@ -33,7 +33,7 @@ namespace sql_dump
 
             //получаем список доступных бд для сервера
             //и выполняем f_each если передана
-            mssql_cli.f_select(new t()
+            mssql_cli.f_select(new t().f_add(true, args).f_add(true, new t()
             {
                 {"cmd",          "exec sp_databases"},
                 {"tab_name",     "tabs"},
@@ -57,7 +57,7 @@ namespace sql_dump
 						return null;
 					})
 				}
-            });
+            }));
         }
 
 		public void f_tab_arr(t args)
