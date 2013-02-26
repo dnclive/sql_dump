@@ -41,6 +41,10 @@ namespace sql_dump
 
 		private tsql_dump f_cre_sql_dump()
 		{
+			if (args["sql_dump"].f_val() != null)
+			{
+				return args["sql_dump"].f_val<tsql_dump>();
+			}
 			tsql_dump sql_dump = new tsql_dump(new t()
 			{
                 {"server",       txt_server.Text},
@@ -79,7 +83,7 @@ namespace sql_dump
 
         private void chb_db_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            tsql_dump sql_dump = args["sql_dump"].f_def_set(f_cre_sql_dump()).f_val<tsql_dump>();
+            tsql_dump sql_dump = f_cre_sql_dump();
 
 			//если в списке уже есть элементы - уже запрашивали
 			if (chb_db.Items.Count > 0)
@@ -116,7 +120,7 @@ namespace sql_dump
 		{
 			ComboBox chb = (ComboBox)sender;
 
-			tsql_dump sql_dump = args["sql_dump"].f_def_set(f_cre_sql_dump()).f_val<tsql_dump>();
+			tsql_dump sql_dump = f_cre_sql_dump();
 
 			//если в списке уже есть элементы - уже запрашивали
 			if (chb.Items.Count > 0)
@@ -141,8 +145,9 @@ namespace sql_dump
 						return null;
 					})
 				},
+				{"f_fail", new t_f<t,t>(f_fail)},
 				{
-					"f_fail", new t_f<t,t>(delegate(t args_1)
+					"f_fail_", new t_f<t,t>(delegate(t args_1)
 					{
 
 						SqlException ex = args_1["ex"].f_val<SqlException>();
@@ -159,7 +164,7 @@ namespace sql_dump
 
 		private void btn_dump_Click(object sender, RoutedEventArgs e)
 		{
-			tsql_dump sql_dump = args["sql_dump"].f_val<tsql_dump>();
+			tsql_dump sql_dump = f_cre_sql_dump();
 
 			sql_dump.f_dump(new t()
 			{
@@ -173,7 +178,8 @@ namespace sql_dump
 
 						return null;
 					})
-				}
+				},
+				{"f_fail", new t_f<t,t>(f_fail)}
 			});
 		}
 

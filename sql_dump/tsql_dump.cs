@@ -42,7 +42,7 @@ namespace sql_dump
                 {"cmd",          "exec sp_databases"},
                 {"tab_name",     "tabs"},
                 {
-					"f_done", new t_f<t,t>(delegate(t args_1)
+					"f_done_", new t_f<t,t>(delegate(t args_1)
 					{
 						DataTable tab=args_1["tab"].f_val<DataTable>();
 					
@@ -60,6 +60,21 @@ namespace sql_dump
 
 						return null;
 					})
+				},
+				{
+					"f_each", new t_f<t,t>(delegate(t args_1)
+					{
+						DataRow dr=args_1["each"]["item"].f_val<DataRow>();
+						int index = args_1["each"]["index"].f_val<int>();
+
+						f_f("f_each", args.f_add(true, new t()
+						{
+							{"item",	dr["database_name"].ToString()},
+							{"index",	index}
+						}));
+
+						return null;
+					})
 				}
             }));
         }
@@ -71,7 +86,7 @@ namespace sql_dump
 
 			//получаем список доступных бд для сервера
 			//и выполняем f_each если передана
-			mssql_cli.f_select(new t()
+			mssql_cli.f_select(new t().f_add(true, args).f_add(true, new t()
             {
                 {"cmd",			"select * from sys.Tables"},
                 {"tab_name",	"tabs"},
@@ -97,7 +112,7 @@ namespace sql_dump
 						return null;
 					})
 				}
-            });
+            }));
 		}
 
 		public void f_dump(t args)
@@ -109,7 +124,7 @@ namespace sql_dump
 
 			//получаем список доступных бд для сервера
 			//и выполняем f_each если передана
-			mssql_cli.f_select(new t()
+			mssql_cli.f_select(new t().f_add(true,args).f_add(true,new t()
             {
                 {"cmd",			"Select * from "+tab_name},
                 {	//когда будет получена таблица
@@ -130,7 +145,7 @@ namespace sql_dump
 						return null;
 					})
 				}
-            });
+            }));
 		}
 
 	}
